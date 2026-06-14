@@ -16,7 +16,7 @@ export default async function AccountPage() {
     .select("role, tenants ( name, slug )");
 
   return (
-    <main style={{ padding: 40 }}>
+    <div>
       <h1 className="text-xl font-semibold text-stone-900">Account</h1>
 
       <dl className="mt-4 space-y-2 text-sm">
@@ -49,14 +49,6 @@ export default async function AccountPage() {
         </p>
       )}
 
-      <form action="/api/auth/sign-out" method="post" className="mt-6">
-        <button
-          type="submit"
-          className="rounded-lg bg-stone-200 px-4 py-2 text-sm font-semibold text-stone-900 transition hover:bg-stone-300"
-        >
-          Sign out
-        </button>
-      </form>
-    </main>
+    </div>
   );
 }

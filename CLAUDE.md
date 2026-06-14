@@ -38,6 +38,13 @@ Next.js (Vercel) · Supabase (Postgres + Auth + RLS) · Trigger.dev (jobs) · Re
   `supabase/migrations/` schema+RLS · `tests/` vitest.
 - Fixes vs B: `middleware.ts` (not `proxy.ts`, so it runs); `supabase/migrations/` added;
   `tests/` added. Keep these.
+- Admin auth lives under `frontend/app/admin/sign-in` and `frontend/app/admin/sign-up`
+  (Supabase Auth, not `/sign-in`/`/sign-up` at root) + `frontend/app/auth/callback/route.ts`.
+  `middleware.ts` allows these two paths unauthenticated; everything else under `/admin`
+  requires a session. The authenticated admin pages (dashboard/leads/emails/account) live
+  under the `frontend/app/admin/(authenticated)/` route group, which has its own
+  `layout.tsx` with the sidebar + session check — this keeps that redirect from looping
+  on `/admin/sign-in`/`/admin/sign-up`.
 
 ## Feature contract — status
 | F | Feature | File | Status |
@@ -49,8 +56,8 @@ Next.js (Vercel) · Supabase (Postgres + Auth + RLS) · Trigger.dev (jobs) · Re
 | F5 | Follow-up sequence | `trigger/jobs/run-followup.ts` | Stub — cron set, body TODO |
 | F6 | Scoring | `T/scoring.ts` | **Done + tested** |
 | F1 | Dedup | `T/dedup.ts` | **Done + tested** |
-| F7 | Admin API | `frontend/app/api/admin/*` | Pattern done; add detail/export/booked/notes |
-| F8 | Admin UI | `frontend/app/admin/*` | Stub |
+| F7 | Admin API | `frontend/app/api/admin/*` | **Done** (leads list/detail/export/booked/notes, email-logs) |
+| F8 | Admin UI | `frontend/app/admin/*` | **Done** — CRM-style dashboard (Dashboard/Leads, slide-over detail panel) |
 | F9 | Unsubscribe | `frontend/app/api/unsubscribe/[token]/route.ts` | **Done** |
 | F10 | Multi-tenant config | `frontend/lib/config/**` | Crunch seeded |
 | F11 | HubSpot CRM | `frontend/lib/crm.ts` | **Done** (call from F4 job) |

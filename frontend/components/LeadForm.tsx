@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import RunStatus from "./RunStatus";
 
 type Props = {
   tenant: string;
@@ -108,13 +107,8 @@ export default function LeadForm({ tenant, utm }: Props) {
   if (state.status === "success" || state.status === "notice") {
     return (
       <div className="rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
-        <h2 className="text-xl font-semibold text-stone-900">
-          {state.status === "success" ? "You're in!" : "Already on the list"}
-        </h2>
-        <p className="mt-2 text-stone-600">{state.message}</p>
-        {state.status === "success" && state.runId && state.publicAccessToken && (
-          <RunStatus runId={state.runId} accessToken={state.publicAccessToken} />
-        )}
+        <h2 className="text-xl font-semibold text-stone-900">Thank you</h2>
+        <p className="mt-2 text-stone-600">Our team will communicate with you shortly.</p>
       </div>
     );
   }

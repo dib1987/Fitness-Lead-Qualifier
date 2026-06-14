@@ -1,7 +1,5 @@
-// F7 — Admin: paginated/searchable list of leads for the logged-in admin's tenant.
-// Auth pattern: verify Supabase session, then read.
-// Because the session client honours RLS (current_admin_tenant_ids()), the query
-// is automatically scoped to tenants this admin manages — no manual tenant filter.
+// F7 — Admin: paginated list of sent emails for the logged-in admin's tenant.
+// RLS-scoped via the session client — no manual tenant filter needed.
 import { NextRequest } from "next/server";
 import { createSessionClient } from "@/lib/supabase";
 
@@ -14,24 +12,20 @@ export async function GET(request: NextRequest) {
 
   const params = request.nextUrl.searchParams;
   const status = params.get("status");
-  const q = params.get("q")?.trim();
   const page = Math.max(1, Number(params.get("page") ?? "1") || 1);
   const pageSize = Math.min(100, Math.max(1, Number(params.get("page_size") ?? "25") || 25));
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
   let query = supabase
-    .from("leads")
-    .select("id, email_address, form_data, status, lead_score, created_at, utm_source, booked_at", {
-      count: "exact",
-    })
-    .order("created_at", { ascending: false })
+    .from("email_logs")
+    .select("id, to_address, subject, body_preview, step_number, status, sent_at", { count: "exact" })
+    .order("sent_at", { ascending: false })
     .range(from, to);
 
   if (status) query = query.eq("status", status);
-  if (q) query = query.or(`email_address.ilike.%${q}%,form_data->>full_name.ilike.%${q}%`);
 
-  const { data, count, error } = await query; // RLS scopes to admin's tenant(s)
+  const { data, count, error } = await query;
   if (error) return Response.json({ error: "Query failed" }, { status: 500 });
   return Response.json({ items: data, total: count ?? 0 });
 }
