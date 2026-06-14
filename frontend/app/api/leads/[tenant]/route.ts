@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 import { createServiceClient } from "@/lib/supabase";
 import { LeadFormSchema } from "@shared/lead-types";
 import { dedupDecision, type ExistingLead } from "@shared/dedup";
-// import { tasks } from "@trigger.dev/sdk/v3"; // enqueue process-lead
+import { tasks, auth } from "@trigger.dev/sdk/v3";
 // import { ratelimit } from "@/lib/ratelimit";  // Upstash limiter (F15)
 
 export async function POST(request: NextRequest, ctx: { params: Promise<{ tenant: string }> }) {
@@ -98,14 +98,23 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ tenant
   }
 
   // 6. Enqueue the Day-0 pipeline (F4). Commit-before-enqueue is automatic here
-  //    because the insert above already persisted. TODO wire Trigger.dev:
-  // await tasks.trigger("process-lead", { leadId: lead.id });
+  //    because the insert above already persisted.
+  const handle = await tasks.trigger("process-lead", { leadId: lead.id });
+
+  // Scoped, short-lived token so the browser can subscribe to this run's
+  // Realtime updates without needing a full Trigger.dev secret key.
+  const publicAccessToken = await auth.createPublicToken({
+    scopes: { read: { runs: [handle.id] } },
+    expirationTime: "15m",
+  });
 
   return Response.json(
     {
       id: lead.id,
       status: "received",
       message: "Thank you for your enquiry. You will receive a personalised email from us within the next few minutes.",
+      runId: handle.id,
+      publicAccessToken,
     },
     { status: 202 }
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import RunStatus from "./RunStatus";
 
 type Props = {
   tenant: string;
@@ -14,7 +15,7 @@ type Props = {
 type SubmitState =
   | { status: "idle" }
   | { status: "submitting" }
-  | { status: "success"; message: string }
+  | { status: "success"; message: string; runId?: string; publicAccessToken?: string }
   | { status: "notice"; message: string }
   | { status: "error"; message: string };
 
@@ -78,6 +79,8 @@ export default function LeadForm({ tenant, utm }: Props) {
         setState({
           status: "success",
           message: data.message ?? "Thanks! Check your email soon.",
+          runId: data.runId,
+          publicAccessToken: data.publicAccessToken,
         });
         return;
       }
@@ -109,6 +112,9 @@ export default function LeadForm({ tenant, utm }: Props) {
           {state.status === "success" ? "You're in!" : "Already on the list"}
         </h2>
         <p className="mt-2 text-stone-600">{state.message}</p>
+        {state.status === "success" && state.runId && state.publicAccessToken && (
+          <RunStatus runId={state.runId} accessToken={state.publicAccessToken} />
+        )}
       </div>
     );
   }

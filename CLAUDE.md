@@ -45,7 +45,7 @@ Next.js (Vercel) · Supabase (Postgres + Auth + RLS) · Trigger.dev (jobs) · Re
 | F1 | Web lead capture | `frontend/app/api/leads/[tenant]/route.ts` | **Done** (reference pattern) |
 | F2 | Facebook ingestion | `frontend/app/api/webhooks/facebook/route.ts` | Stub — HMAC done, body TODO |
 | F3 | Reply/bounce (Resend) | `frontend/app/api/webhooks/email/route.ts` | Stub — verify sig + handlers TODO |
-| F4 | Day-0 pipeline | `trigger/jobs/process-lead.ts` | Stub — steps listed; build vs local `process_lead.py` |
+| F4 | Day-0 pipeline | `trigger/jobs/process-lead.ts` | **Done** (idempotency, cost cap, Realtime metadata) |
 | F5 | Follow-up sequence | `trigger/jobs/run-followup.ts` | Stub — cron set, body TODO |
 | F6 | Scoring | `T/scoring.ts` | **Done + tested** |
 | F1 | Dedup | `T/dedup.ts` | **Done + tested** |
@@ -55,7 +55,7 @@ Next.js (Vercel) · Supabase (Postgres + Auth + RLS) · Trigger.dev (jobs) · Re
 | F10 | Multi-tenant config | `frontend/lib/config/**` | Crunch seeded |
 | F11 | HubSpot CRM | `frontend/lib/crm.ts` | **Done** (call from F4 job) |
 | F12 | Email send | `frontend/lib/resend.ts` | Client done; wire in F4/F5 |
-| F13 | LLM + cost | `trigger/jobs/process-lead.ts` + `T/cost.ts` | Cost helper done; LLM call + cap TODO |
+| F13 | LLM + cost | `trigger/jobs/process-lead.ts` + `T/cost.ts` | **Done** |
 | F14 | Audit log | `audit_logs` table | Schema done; write from jobs |
 | F16 | Data model | `supabase/migrations/0001_init.sql` | **Done** |
 
