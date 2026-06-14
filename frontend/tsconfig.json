@@ -28,6 +28,9 @@
       ],
       "@shared/*": [
         "../T/*"
+      ],
+      "zod": [
+        "./node_modules/zod"
       ]
     }
   },
