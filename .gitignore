@@ -16,3 +16,4 @@ supabase/.branches/
 supabase/.temp/
 
 .claude/
+.vercel/

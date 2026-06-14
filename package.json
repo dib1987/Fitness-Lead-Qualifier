@@ -1,0 +1,8 @@
+{
+  "name": "lead-engine",
+  "private": true,
+  "description": "Root package — provides shared dependencies for T/ used by frontend and trigger.",
+  "dependencies": {
+    "zod": "^3.25.76"
+  }
+}
