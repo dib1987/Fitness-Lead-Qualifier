@@ -31,9 +31,11 @@ export async function middleware(request: NextRequest) {
 
   // Only the admin dashboard pages are gated. Public lead form + webhooks are open
   // (webhooks self-verify signatures; lead form is public by design).
-  if (path.startsWith("/admin") && !user) {
+  // Sign-in/sign-up pages must stay open to unauthenticated users, or this redirect loops.
+  const isAuthPage = path === "/admin/sign-in" || path === "/admin/sign-up";
+  if (path.startsWith("/admin") && !isAuthPage && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/sign-in";
+    url.pathname = "/admin/sign-in";
     return NextResponse.redirect(url);
   }
 

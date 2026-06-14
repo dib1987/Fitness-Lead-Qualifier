@@ -2,12 +2,13 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 
-export default function SignUpPage() {
+export default function SignInPage() {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -19,7 +20,7 @@ export default function SignUpPage() {
     const password = String(form.get("password") ?? "");
 
     const supabase = createBrowserSupabaseClient();
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError(error.message);
@@ -27,30 +28,14 @@ export default function SignUpPage() {
       return;
     }
 
-    setDone(true);
-    setSubmitting(false);
-  }
-
-  if (done) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-8 shadow-sm text-center">
-          <h1 className="text-xl font-semibold text-stone-900">Check your email</h1>
-          <p className="mt-2 text-stone-600">
-            We sent a confirmation link to finish creating your account.
-          </p>
-          <Link href="/sign-in" className="mt-4 inline-block font-medium text-amber-600 hover:underline">
-            Back to sign in
-          </Link>
-        </div>
-      </main>
-    );
+    router.push("/admin");
+    router.refresh();
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-stone-900">Sign up</h1>
+        <h1 className="text-xl font-semibold text-stone-900">Sign in</h1>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-stone-700">
@@ -75,8 +60,7 @@ export default function SignUpPage() {
               name="password"
               type="password"
               required
-              minLength={6}
-              autoComplete="new-password"
+              autoComplete="current-password"
               className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-stone-900 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
             />
           </div>
@@ -88,14 +72,14 @@ export default function SignUpPage() {
             disabled={submitting}
             className="w-full rounded-lg bg-amber-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? "Signing up…" : "Sign up"}
+            {submitting ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-stone-600">
-          Already have an account?{" "}
-          <Link href="/sign-in" className="font-medium text-amber-600 hover:underline">
-            Sign in
+          Don&apos;t have an account?{" "}
+          <Link href="/admin/sign-up" className="font-medium text-amber-600 hover:underline">
+            Sign up
           </Link>
         </p>
       </div>
