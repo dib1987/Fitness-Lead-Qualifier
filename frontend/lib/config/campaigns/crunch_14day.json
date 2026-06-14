@@ -1,0 +1,8 @@
+{
+  "slug": "crunch_14day",
+  "name": "Crunch 14-Day Journey",
+  "steps": [
+    { "step": 0, "delay_days": 0, "subject_template": "Welcome to Crunch, {first_name}", "prompt_template": "Write a warm welcome email for {first_name} interested in {fitness_goal} at {preferred_gym_location}." },
+    { "step": 1, "delay_days": 3, "subject_template": "{first_name}, your first session", "prompt_template": "Encourage {first_name} to book a first session for {fitness_goal}." }
+  ]
+}

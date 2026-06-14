@@ -1,0 +1,13 @@
+{
+  "slug": "crunch_fitness",
+  "name": "Crunch Fitness",
+  "default_campaign_slug": "crunch_14day",
+  "company": { "signature_name": "The Crunch Team" },
+  "hubspot": { "lifecycle_stage": "lead" },
+  "facebook_page_id": "",
+  "facebook_field_mapping": {
+    "full_name": "full_name",
+    "email": "email_address",
+    "phone_number": "phone_number"
+  }
+}
