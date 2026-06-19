@@ -163,7 +163,7 @@ export const runFollowup = schedules.task({
         });
 
         // Send via Resend — append one-click unsubscribe footer
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+        const appUrl = process.env.APP_URL ?? "";
         const unsubscribeFooter = appUrl && lead.unsubscribe_token
           ? `\n\n---\nTo stop receiving emails: ${appUrl}/unsubscribe/${lead.unsubscribe_token}`
           : "";

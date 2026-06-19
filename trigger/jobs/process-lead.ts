@@ -184,7 +184,7 @@ export const processLead = task({
 
     // 9. send via Resend — append one-click unsubscribe footer
     await metadata.set("step", "sending_email");
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const appUrl = process.env.APP_URL ?? "";
     const unsubscribeFooter = appUrl
       ? `\n\n---\nTo stop receiving emails: ${appUrl}/unsubscribe/${lead.unsubscribe_token}`
       : "";
