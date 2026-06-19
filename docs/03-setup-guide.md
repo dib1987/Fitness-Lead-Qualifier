@@ -48,7 +48,28 @@ This step creates all the tables (think of tables like spreadsheets) that the sy
 6. Click the green **Run** button
 7. You should see: `Success. No rows returned.` — this means it worked
 
-### Step 1.4 — Create the Admin User
+### Step 1.4 — Configure the Production URL (Critical)
+
+This step tells Supabase where to send users after they click email confirmation links. If skipped, confirmation links will redirect to `localhost:3000` instead of your live website.
+
+1. In Supabase, click **Authentication** in the left sidebar
+2. Click **URL Configuration**
+3. Set **Site URL** to your production Vercel URL:
+   ```
+   https://your-project.vercel.app
+   ```
+4. Under **Redirect URLs**, click **Add URL** and add:
+   ```
+   https://your-project.vercel.app/**
+   ```
+   (The `/**` wildcard allows all paths on your domain)
+5. Click **Save changes**
+
+> **If you skip this step:** Admin confirmation emails will contain links to `localhost:3000` which will fail for anyone not running the app locally.
+
+---
+
+### Step 1.5 — Create the Admin User
 
 This creates the login account for the admin dashboard.
 
@@ -60,7 +81,7 @@ This creates the login account for the admin dashboard.
 4. Click **Create user**
 5. Copy the **User UID** that appears (it looks like: `abc12345-...`) — you will need it in the next step
 
-### Step 1.5 — Link the Admin to a Tenant
+### Step 1.6 — Link the Admin to a Tenant
 
 Now you need to tell the system which gym this admin manages.
 
@@ -86,7 +107,7 @@ Now you need to tell the system which gym this admin manages.
    ```
 3. Click **Run** — you should see: `1 row(s) inserted`
 
-### Step 1.6 — Add the Campaign (Email Sequence)
+### Step 1.7 — Add the Campaign (Email Sequence)
 
 1. In Supabase, go to **Table Editor** → click the `campaigns` table
 2. Click **Insert row**
@@ -98,7 +119,7 @@ Now you need to tell the system which gym this admin manages.
    - `is_active`: `true`
 4. Click **Save**
 
-### Step 1.7 — Get Your Supabase API Keys
+### Step 1.8 — Get Your Supabase API Keys
 
 These are the "passwords" that let the website and the email robot talk to the database.
 

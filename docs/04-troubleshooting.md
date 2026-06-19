@@ -180,6 +180,48 @@ if (!secret) {
 
 ---
 
+## Issue 10 — Admin Confirmation Email Links to localhost Instead of Production
+
+**Symptom:** Admin clicks the email verification link after sign-up. Browser opens `localhost:3000/?code=...` and shows "This site can't be reached".
+
+**Root cause:** Supabase's **Site URL** was still set to `localhost:3000` (the default for local development). Supabase uses the Site URL to build the link it sends in confirmation emails. If this is not updated to the production URL, every email link points to the local machine.
+
+**Solution:**
+1. Go to [supabase.com](https://supabase.com) → your project → **Authentication** → **URL Configuration**
+2. Set **Site URL** to your production Vercel URL:
+   ```
+   https://your-project.vercel.app
+   ```
+3. Under **Redirect URLs**, click **Add URL** and add:
+   ```
+   https://your-project.vercel.app/**
+   ```
+4. Click **Save changes**
+5. Ask the admin to sign up again — the new confirmation email will contain the correct production link
+
+**Important:** This must be done as part of the initial production setup, before any admin accounts are created. See `docs/03-setup-guide.md` Step 1.4.
+
+---
+
+## Issue 11 — New Admin Signed Up But Cannot See Any Leads
+
+**Symptom:** Admin confirms email, logs in successfully, but the leads table is empty. No error — just no data.
+
+**Root cause:** The sign-up page creates a Supabase Auth account but does NOT automatically grant access to tenant data. Access is controlled by the `admin_users` table — a developer must manually add a row linking the new user to the correct tenant.
+
+**Solution:** Run this SQL in Supabase → SQL Editor (replace the email and slug with real values):
+```sql
+INSERT INTO admin_users (user_id, tenant_id)
+SELECT u.id, t.id
+FROM auth.users u, tenants t
+WHERE u.email = 'new-admin@email.com'
+  AND t.slug = 'crunch';
+```
+
+**Why it works this way:** This is intentional. If sign-up automatically gave full data access, any stranger who found the sign-up URL could view all your leads. Manual linking by a developer is the access control gate.
+
+---
+
 ## Quick Reference — Environment Variable Checklist
 
 If something is not working, run through this checklist:
