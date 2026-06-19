@@ -162,12 +162,18 @@ export const runFollowup = schedules.task({
           estimated_cost_usd: estimateCostUsd(inputTokens, outputTokens),
         });
 
-        // Send via Resend
+        // Send via Resend — append one-click unsubscribe footer
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+        const unsubscribeFooter = appUrl && lead.unsubscribe_token
+          ? `\n\n---\nTo stop receiving emails: ${appUrl}/unsubscribe/${lead.unsubscribe_token}`
+          : "";
+        const emailBody = emailOutput.body + unsubscribeFooter;
+
         const { data: sendResult, error: sendError } = await getResend().emails.send({
           from: FROM_EMAIL,
           to: lead.email_address,
           subject: emailOutput.subject,
-          text: emailOutput.body,
+          text: emailBody,
         });
         if (sendError) {
           throw new Error(`Resend send failed: ${sendError.message}`);
@@ -179,7 +185,7 @@ export const runFollowup = schedules.task({
           step_number: currentStepIndex,
           to_address: lead.email_address,
           subject: emailOutput.subject,
-          body_preview: emailOutput.body.slice(0, 280),
+          body_preview: emailBody.slice(0, 280),
           provider_message_id: sendResult?.id,
           status: "sent",
         });
