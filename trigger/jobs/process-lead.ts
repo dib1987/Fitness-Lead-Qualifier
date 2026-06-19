@@ -10,6 +10,7 @@ import { estimateCostUsd } from "../../T/cost";
 import { createServiceClient } from "../lib/supabase";
 import { getResend, FROM_EMAIL } from "../lib/resend";
 import { upsertContact } from "../lib/crm";
+import { interpolate } from "../lib/utils";
 
 const MODEL = "claude-sonnet-4-6";
 const DAILY_COST_CAP_USD = 5;
@@ -18,10 +19,6 @@ const EmailOutputSchema = z.object({
   subject: z.string().min(1).max(200),
   body: z.string().min(1).max(5000),
 });
-
-function interpolate(template: string, values: Record<string, string>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match);
-}
 
 export const processLead = task({
   id: "process-lead",
