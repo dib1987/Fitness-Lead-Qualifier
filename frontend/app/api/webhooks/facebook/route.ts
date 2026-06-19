@@ -27,18 +27,19 @@ export async function POST(request: NextRequest) {
   // Always return 200 to prevent Meta retry storms. Process asynchronously.
   const ok = Response.json({ status: "ok" });
 
-  // 1. Verify HMAC-SHA256 signature
+  // 1. Verify HMAC-SHA256 signature — reject if secret not configured
   const secret = process.env.FB_APP_SECRET;
+  if (!secret) {
+    return Response.json({ error: "Webhook secret not configured" }, { status: 500 });
+  }
   const sig = request.headers.get("x-hub-signature-256") ?? "";
-  if (secret) {
-    const expected =
-      "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
-    if (
-      sig.length !== expected.length ||
-      !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))
-    ) {
-      return ok;
-    }
+  const expected =
+    "sha256=" + crypto.createHmac("sha256", secret).update(raw).digest("hex");
+  if (
+    sig.length !== expected.length ||
+    !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(sig))
+  ) {
+    return ok; // return 200 to prevent Meta retry storms
   }
 
   let body: unknown;

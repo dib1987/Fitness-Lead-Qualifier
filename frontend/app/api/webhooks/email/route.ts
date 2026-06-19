@@ -20,20 +20,21 @@ type ResendEvent = {
 export async function POST(request: NextRequest) {
   const raw = await request.text();
 
-  // 1. Verify Resend webhook signature (Svix)
+  // 1. Verify Resend webhook signature (Svix) — reject if secret not configured
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET;
-  if (webhookSecret) {
-    const svixHeaders = {
-      "svix-id": request.headers.get("svix-id") ?? "",
-      "svix-timestamp": request.headers.get("svix-timestamp") ?? "",
-      "svix-signature": request.headers.get("svix-signature") ?? "",
-    };
-    try {
-      const wh = new Webhook(webhookSecret);
-      wh.verify(raw, svixHeaders);
-    } catch {
-      return Response.json({ error: "Invalid signature" }, { status: 400 });
-    }
+  if (!webhookSecret) {
+    return Response.json({ error: "Webhook secret not configured" }, { status: 500 });
+  }
+  const svixHeaders = {
+    "svix-id": request.headers.get("svix-id") ?? "",
+    "svix-timestamp": request.headers.get("svix-timestamp") ?? "",
+    "svix-signature": request.headers.get("svix-signature") ?? "",
+  };
+  try {
+    const wh = new Webhook(webhookSecret);
+    wh.verify(raw, svixHeaders);
+  } catch {
+    return Response.json({ error: "Invalid signature" }, { status: 400 });
   }
 
   let event: ResendEvent;

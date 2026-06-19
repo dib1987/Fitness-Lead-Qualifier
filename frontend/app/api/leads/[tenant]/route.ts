@@ -6,14 +6,18 @@ import { createServiceClient } from "@/lib/supabase";
 import { LeadFormSchema } from "@shared/lead-types";
 import { dedupDecision, type ExistingLead } from "@shared/dedup";
 import { tasks, auth } from "@trigger.dev/sdk/v3";
-// import { ratelimit } from "@/lib/ratelimit";  // Upstash limiter (F15)
+import { getRatelimit } from "@/lib/ratelimit";
 
 export async function POST(request: NextRequest, ctx: { params: Promise<{ tenant: string }> }) {
   const { tenant: tenantSlug } = await ctx.params;
 
-  // 1. Rate limit (F15 — Upstash). TODO wire limiter.
-  // const { success } = await ratelimit.limit(`leads:${tenantSlug}`);
-  // if (!success) return Response.json({ error: "Too many requests" }, { status: 429 });
+  // 1. Rate limit — 10 submissions/min per IP per tenant. Fails open if Upstash not configured.
+  const rl = getRatelimit();
+  if (rl) {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anon";
+    const { success } = await rl.limit(`${tenantSlug}:${ip}`);
+    if (!success) return Response.json({ error: "Too many requests" }, { status: 429 });
+  }
 
   // 2. Validate body (F1)
   let raw: unknown;
